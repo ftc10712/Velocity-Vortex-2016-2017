@@ -29,6 +29,8 @@ public class SheldonTeleOp extends OpMode {
 
     @Override
     public void loop() {
+
+
         // Sample Code Not Production
         if(sheldon.getColorSensor1ColorDetected() == "Red"){
             if(sheldon.leftBeaconServo.getPosition() < .1){  //Assume left beacon servo motor is retracted
