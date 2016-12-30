@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
  * Created by Austin Ford & Tristan Sorenson on 12/19/2016.
@@ -12,14 +12,37 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 public class SheldonAutonomous extends OpMode {
 
+    /*------------Member Variables--------------------*/
+
+    // New instance of our robot class we will call "Sheldon"
     Robot sheldon = new Robot();
-    final String TEAM_COLOR = "Red";
+
+    //Setup toggle variables to choose whether to run the "Red" Team Autonomous or "Blue"
+    //Team Autonomous mode...
+    boolean teamColorToggle = false;
+    boolean teamColorToggleCurrentState = false;
+    String TEAM_COLOR = "Red";
+
+    String beaconActivated = "Not Activated...";
+    ElapsedTime autonomousRunTime = new ElapsedTime();
 
 
     @Override
     public void init() {
         sheldon.initializeRobot(hardwareMap);
+    }
 
+    public void init_loop() {
+        //Press Game Pad 1 - x button for blue team and Game Pad 1 - b button for Red Team
+
+        if (gamepad1.x == true) {
+            TEAM_COLOR = "Blue";
+        } else if (gamepad1.b == true) {
+            TEAM_COLOR = "Red";
+        }
+
+
+        telemetry.addData("Current Team Color Selected", TEAM_COLOR);
         telemetry.addData("Left Beacon Servo", sheldon.getLeftBeaconServoStatus());
         telemetry.addData("Right Beacon Servo", sheldon.getRightBeaconServoStatus());
         telemetry.addData("Optical Distance Sensor 1", sheldon.getOpticalDistanceSensor1Status());
@@ -29,6 +52,7 @@ public class SheldonAutonomous extends OpMode {
         telemetry.addData("Color Sensor 2", sheldon.getColorSensor2Status());
         updateTelemetry(telemetry);
     }
+
 
     @Override
     public void loop() {
@@ -56,8 +80,8 @@ public class SheldonAutonomous extends OpMode {
 
         } else if (sheldon.getColorSensor1ColorDetected() == TEAM_COLOR && sheldon.getColorSensor2ColorDetected() == TEAM_COLOR) {
             //Add code to slowly drive toward beacons
-            //boolean beaconActivated;
-            telemetry.addData("Beacon Status: ", "Successfully Activated!");
+
+            beaconActivated = "Successfully Activated!";
 
         } else {
             //Add code to slowly drive toward beacons
@@ -70,8 +94,9 @@ public class SheldonAutonomous extends OpMode {
         telemetry.addData("Toch Sensor Button is currently ", sheldon.isTouchSensorPressed());
         telemetry.addData("Color Sensor 1 Detected ", sheldon.getColorSensor1ColorDetected());
         telemetry.addData("Color Sensor 2 Detected ", sheldon.getColorSensor2ColorDetected());
-        telemetry.addData("Optical Distance 1 Raw Light", sheldon.getOpticalDistanceSensor1RawLightDetected());
-        telemetry.addData("Optical Distance 1 Normal Light", sheldon.getOpticalDistanceSensor1NormalLightDettected());
+        telemetry.addData("Optical Distance 1 Raw Light", "%.2f", sheldon.getOpticalDistanceSensor1RawLightDetected());
+        telemetry.addData("Optical Distance 1 Normal Light", "%.2f", sheldon.getOpticalDistanceSensor1NormalLightDettected());
+        telemetry.addData("Color Beacon: ", beaconActivated);
         updateTelemetry(telemetry);
     }
 }
