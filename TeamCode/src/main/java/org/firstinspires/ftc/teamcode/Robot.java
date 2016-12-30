@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
  * Created by Austin Ford and Tristan Sorenson 12/18/2016.
+ *
  */
 
 class Robot extends SensorHardware {
@@ -20,7 +21,7 @@ class Robot extends SensorHardware {
 
     /**
      *
-     * @param hwMap
+     * @param hwMap - Copy of Hardware Map to Send to Classes to Initialize Robot
      *
      */
     void initializeRobot(HardwareMap hwMap) {
