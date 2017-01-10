@@ -18,7 +18,8 @@ public class SheldonTeleOp extends OpMode {
     double leftDCMotorPower = 0;            //Power Value for Left DC Drive Motors
     double rightDCMotorPower = 0;           //Power Value for Right DC Drive Motors
     boolean toggleDriveDirection = false;   //Toggle which side of the robot will drive forward
-    boolean driveDirection = false;         //Variable defined to reverse motor power when direction toggled
+    boolean driveDirection = false;         //Toggle direction of motor power when direction toggled
+    String frontSideOfRobot = "Forklift";   //Default front side of robot is Forklift Side
 
     float rightServoRetractedPosition = .1f; //Threshold sre
 
@@ -52,20 +53,32 @@ public class SheldonTeleOp extends OpMode {
 
             if (driveDirection) {
                 //Set the front of the robot to be the Particle Shooter side of the robot.
-                leftDCMotorPower = gamepad1.left_stick_y;
-                rightDCMotorPower = gamepad1.right_stick_y;
+                frontSideOfRobot = "Particle Shooter";  //Telemetry data variable
+
             } else {
                 //Set the front of the robot to be the Forklift side of the robot.
-                leftDCMotorPower = -gamepad1.left_stick_y;
-                rightDCMotorPower = -gamepad1.left_stick_y;
+                frontSideOfRobot = "Forklift";      //Telemetry data variable
             }
 
-            sheldon.driveRobot(leftDCMotorPower, rightDCMotorPower);
+            toggleDriveDirection = true;
 
         } else if (!gamepad1.left_stick_button) {
             toggleDriveDirection = false;
-        }
 
+        }
+        //Drive the robot in the direction selected
+        if (frontSideOfRobot == "Particle Shooter") {
+
+            leftDCMotorPower = gamepad1.left_stick_y;
+            rightDCMotorPower = gamepad1.right_stick_y;
+            sheldon.driveRobot(leftDCMotorPower, rightDCMotorPower);
+
+        } else if (frontSideOfRobot == "Forklift") {
+
+            leftDCMotorPower = -gamepad1.left_stick_y;
+            rightDCMotorPower = -gamepad1.right_stick_y;
+            sheldon.driveRobot(leftDCMotorPower, rightDCMotorPower);
+        }
 
         // Good Code
 
@@ -86,7 +99,10 @@ public class SheldonTeleOp extends OpMode {
 
         //telemetry.addData("Toch Sensor Button is currently ", sheldon.isTouchSensorPressed());
         //telemetry.addData("Color Sensor 1 Detected ", sheldon.getColorSensor1ColorDetected());
+
         telemetry.addData("Left Joystick Button", toggleDriveDirection);
+        telemetry.addData("Motor Direction", driveDirection);
+        telemetry.addData("Front Side Facing", frontSideOfRobot);
         updateTelemetry(telemetry);
     }
 }
