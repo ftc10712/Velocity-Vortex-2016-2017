@@ -2,11 +2,13 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 
 /**
  * Created by Austin Ford & Tristan Sorenson on 12/15/2016.
- *
  */
 
 
@@ -37,6 +39,7 @@ class DcMotorHardware {
          */
         try {
             rightFrontMotor = hwMap.dcMotor.get("right_front_motor");
+            rightFrontMotor.setDirection(REVERSE);
         } catch (Exception errorMessage) {
             DbgLog.msg(errorMessage.getLocalizedMessage());
             rightFrontMotor = null;
@@ -45,6 +48,7 @@ class DcMotorHardware {
 
         try {
             rightRearMotor = hwMap.dcMotor.get("right_rear_motor");
+            rightRearMotor.setDirection(REVERSE);
         } catch (Exception errorMessage) {
             DbgLog.msg(errorMessage.getLocalizedMessage());
             rightRearMotor = null;
@@ -64,6 +68,14 @@ class DcMotorHardware {
             leftRearMotor = null;
         }
     }
+
+    public void driveRobot(double leftDCMotorPower, double rightDCMotorPower) {
+        leftRearMotor.setPower(leftDCMotorPower);
+        rightRearMotor.setPower(rightDCMotorPower);
+        leftFrontMotor.setPower(leftDCMotorPower);
+        rightFrontMotor.setPower(rightDCMotorPower);
+    }
+
 
 
 }
