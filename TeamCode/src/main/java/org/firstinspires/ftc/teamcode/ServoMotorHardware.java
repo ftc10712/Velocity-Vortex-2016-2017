@@ -17,8 +17,24 @@ class ServoMotorHardware extends DcMotorHardware {
     //Member Variables for Servos on Servo Controller AI02QSMX
     private CRServo leftForkGripperServo;
     private CRServo rightForkGripperServo;
-    private Servo leftForkDeployServo;
-    private Servo rightForkDeployServo;
+
+    private Servo leftForkServo;
+    float leftForkServoCalibratedMin = 0f;
+    float leftForkServoCalibratedMax = .94f;     //Modern Robotics updated firmware to go beyond
+    //130 degrees.  This calibrates the servo to turn
+    //180 degrees. Change min and max to suit servos
+    private Servo rightForkServo;
+    float rightForkServoCalibratedMin = 0f;
+    float rightForkServoCalibratedMax = .96f;    //Modern Robotics updated firmware to go beyond
+    //130 degrees.  This calibrates the servo to turn
+    //180 degrees.  Change min and max to suit servos
+
+    private CRServo leftMastHorizontalServo;
+    private CRServo rightMastHorizontalServo;
+
+
+
+
 
     //Member Variables for Servos on Servo Controller A104ORQT
     protected Servo leftBeaconServo;
@@ -58,15 +74,30 @@ class ServoMotorHardware extends DcMotorHardware {
 
         //Fork Deploy Servo Motor Initialization - These are standard 180 degree Servos
         try {
-            leftForkDeployServo = hwMap.servo.get("left_fork_deploy_servo");
+            leftForkServo = hwMap.servo.get("left_fork_deploy_servo");
         } catch (Exception errorMessage) {
-            leftForkDeployServo = null;
+            leftForkServo = null;
         }
 
         try {
-            rightForkDeployServo = hwMap.servo.get("right_fork_deploy_servo");
+            rightForkServo = hwMap.servo.get("right_fork_deploy_servo");
         } catch (Exception errorMessage) {
-           rightForkDeployServo = null;
+            rightForkServo = null;
+        }
+
+        //Mast Servo Motor Initialization - These are Continuous Rotation Servos
+        try {
+            leftMastHorizontalServo = hwMap.crservo.get("left_mast_horizontal_servo");
+            leftMastHorizontalServo.setDirection(FORWARD);
+        } catch (Exception errorMessage) {
+            leftMastHorizontalServo = null;
+        }
+
+        try {
+            rightMastHorizontalServo = hwMap.crservo.get("right_mast_horizontal_servo");
+            rightMastHorizontalServo.setDirection(REVERSE);
+        } catch (Exception errorMessage) {
+            rightMastHorizontalServo = null;
         }
 
         //---------------End Servos Assigned to Servo Controller AI02QSMX-------------------------//
@@ -96,20 +127,20 @@ class ServoMotorHardware extends DcMotorHardware {
     /**
      * forkGripperOpen Method opens the forks when called
      *
-     * @param gripperSpeed    - Speed at which to move the gripper servos
-     * @param directionToMove - Given as either OPEN or CLOSE
+     * @param gripperServoSpeed      - Speed at which to move the gripper servos
+     * @param directionToMoveGripper - Given as either OPEN or CLOSE
      */
 
-    void forkGripperMove(String directionToMove, double gripperSpeed) {
+    void forkGripperMove(String directionToMoveGripper, double gripperServoSpeed) {
 
-        if (directionToMove.equals("OPEN")) {
+        if (directionToMoveGripper.equals("OPEN")) {
 
-            leftForkGripperServo.setPower(gripperSpeed);
-            rightForkGripperServo.setPower(-gripperSpeed);
+            leftForkGripperServo.setPower(gripperServoSpeed);
+            rightForkGripperServo.setPower(gripperServoSpeed);
 
-        } else if (directionToMove.equals("CLOSE")) {
-            leftForkGripperServo.setPower(-gripperSpeed);
-            rightForkGripperServo.setPower(gripperSpeed);
+        } else if (directionToMoveGripper.equals("CLOSE")) {
+            leftForkGripperServo.setPower(-gripperServoSpeed);
+            rightForkGripperServo.setPower(-gripperServoSpeed);
         }
     }
 
@@ -118,55 +149,31 @@ class ServoMotorHardware extends DcMotorHardware {
         rightForkGripperServo.setPower(0);
     }
 
+    //Method to move the mast servos forward and reverse
+    void mastServoMove(String directionToMove, double mastServoSpeed) {
 
-    /*
+        if (directionToMove.equals("FORWARD")) {
 
+            leftMastHorizontalServo.setPower(mastServoSpeed);
+            rightMastHorizontalServo.setPower(mastServoSpeed - .1);
 
-    public void forkGripperOpen(double speed) {
+        } else if (directionToMove.equals("REVERSE")) {
 
-        double GRIPPER_SPEED = speed;
-
-        if (leftForkGripperServo != null) {
-            leftForkGripperServo.setDirection(FORWARD);
-            leftForkGripperServo.setPower(GRIPPER_SPEED);
+            leftMastHorizontalServo.setPower(-mastServoSpeed);
+            rightMastHorizontalServo.setPower(-mastServoSpeed - .1);
         }
-
-        if (rightForkGripperServo != null) {
-            rightForkGripperServo.setDirection(REVERSE);
-            rightForkGripperServo.setPower(GRIPPER_SPEED);
-        }
-
     }
 
-    /**
-     * forkGripperClose Method closes the forks when called
-     * @param speed
-     */
-
-    /*
-    public void forkGripperClose(double speed) {
-
-        double GRIPPER_SPEED = speed;
-
-        if (leftForkGripperServo != null) {
-            leftForkGripperServo.setDirection(FORWARD);
-            leftForkGripperServo.setPower(GRIPPER_SPEED);
-        }
-
-        if (rightForkGripperServo != null) {
-            rightForkGripperServo.setDirection(REVERSE);
-            rightForkGripperServo.setPower(GRIPPER_SPEED);
-        }
-
+    void mastServoStop() {
+        leftMastHorizontalServo.setPower(0);
+        rightMastHorizontalServo.setPower(0);
     }
 
-
-    */
 
     //Method to check the status of left and right beacon servos
-    String getLeftBeaconServoStatus(){
+    String getLeftBeaconServoStatus() {
         String leftBeaconServoStatus;
-        if(leftBeaconServo != null){
+        if (leftBeaconServo != null) {
             leftBeaconServoStatus = "Initialized";
         } else {
             leftBeaconServoStatus = "Failed to Initialize";
@@ -174,9 +181,9 @@ class ServoMotorHardware extends DcMotorHardware {
         return leftBeaconServoStatus;
     }
 
-    String getRightBeaconServoStatus(){
+    String getRightBeaconServoStatus() {
         String rightBeaconServoStatus;
-        if(leftBeaconServo != null){
+        if (leftBeaconServo != null) {
             rightBeaconServoStatus = "Initialized";
         } else {
             rightBeaconServoStatus = "Failed to Initialize";
@@ -184,21 +191,40 @@ class ServoMotorHardware extends DcMotorHardware {
         return rightBeaconServoStatus;
     }
 
-    //Sample Test Code not production
-    void deployLeftBeaconServo(){
+    //Methods to Deploy Beacon Servos
+    void deployLeftBeaconServo() {
         leftBeaconServo.setPosition(.9);
     }
 
-    void retractLeftBeaconServo(){
-        leftBeaconServo.setPosition(0);
-    }
-
-    void deployRightBeaconServo(){
+    void deployRightBeaconServo() {
         rightBeaconServo.setPosition(.92);
     }
 
-    void retractRightBeaconServo(){
+    //Methods to Retract Servo Beacons
+    void retractLeftBeaconServo() {
+        leftBeaconServo.setPosition(0);
+    }
+
+    void retractRightBeaconServo() {
         rightBeaconServo.setPosition(0);
+    }
+
+    //Methods to Deploy Fork Blade Servos
+    void deployLeftForkBladeServo() {
+        leftForkServo.setPosition(leftForkServoCalibratedMax);
+    }
+
+    void deployRightForkBladeServo() {
+        rightForkServo.setPosition(rightForkServoCalibratedMin);
+    }
+
+    //Methods to Retract Fork Blade Servos
+    void retractLeftForkBladeServo() {
+        leftForkServo.setPosition(leftForkServoCalibratedMin);
+    }
+
+    void retractRightForkBladeServo() {
+        rightForkServo.setPosition(leftForkServoCalibratedMax);
     }
 
 }
