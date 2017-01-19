@@ -37,6 +37,10 @@ public class SheldonTeleOp extends OpMode {
     boolean forkDeployStatus = false;    //Checks to see if a button on joystick was pressed
     String positionOfForks = "Retracted";   //Default front side of robot is Forklift Side
 
+    boolean toggleButton = false;
+    boolean toggleButtonStatus = false;
+    String buttonStatus = "On";
+
     @Override
     public void init() {
         sheldon.initializeRobot(hardwareMap);
@@ -122,30 +126,33 @@ public class SheldonTeleOp extends OpMode {
         /**********************End of Mast Moving Forward or Reverse Routine********************/
 
         /**********************Fork Deploy & Retract Routine************************************/
-        if (gamepad1.a && !toggleForkDeploy) {
+//        if (gamepad1.a && !toggleForkDeploy) {
+//
+//            //  If left joystick button is pressed, change direction of the front of the robot from
+//            //  it currently was set.  The inital side considered forward is the forklift side of
+//            //  the robot.
+//
+//            forkDeployStatus = !forkDeployStatus;
+//
+//            if (forkDeployStatus) {
+//                //Set the front of the robot to be the Particle Shooter side of the robot.
+//                positionOfForks = "Retracted";  //Telemetry data variable
+//
+//            } else {
+//                //Set the front of the robot to be the Forklift side of the robot.
+//                positionOfForks = "Deployed";      //Telemetry data variable
+//            }
+//
+//            toggleForkDeploy = true;
+//
+//        } else if (!gamepad1.a) {
+//            toggleForkDeploy = false;
+//
+//        }
 
-            //  If left joystick button is pressed, change direction of the front of the robot from
-            //  it currently was set.  The inital side considered forward is the forklift side of
-            //  the robot.
 
-            forkDeployStatus = !forkDeployStatus;
+        sheldon.toggleJoystickButton(gamepad1.a, "Deployed", "Retracted");
 
-            if (forkDeployStatus) {
-                //Set the front of the robot to be the Particle Shooter side of the robot.
-                positionOfForks = "Retracted";  //Telemetry data variable
-
-            } else {
-                //Set the front of the robot to be the Forklift side of the robot.
-                positionOfForks = "Deployed";      //Telemetry data variable
-            }
-
-            toggleForkDeploy = true;
-
-        } else if (!gamepad1.a) {
-            toggleForkDeploy = false;
-
-        }
-        //Drive the robot in the direction selected
         if (positionOfForks == "Deployed") {
             sheldon.deployLeftForkBladeServo();
             sheldon.deployRightForkBladeServo();
@@ -155,6 +162,7 @@ public class SheldonTeleOp extends OpMode {
             sheldon.retractRightForkBladeServo();
         }
         /**********************End Fork Deploy & Retract Routine********************************/
+
 
         telemetry.addData("Left Joystick Button", toggleDriveDirection);
         telemetry.addData("Motor Direction", driveDirection);
