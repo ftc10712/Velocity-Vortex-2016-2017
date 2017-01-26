@@ -1,14 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
 /**
- * Created by Darrell on 1/19/2017.
+ * Created by Austin Ford on January 19, 2017
  */
 
-public class JoystickHardware extends SensorHardware {
+class JoystickHardware extends SensorHardware {
 
-    boolean toggleButtonStatus = false;
-    boolean toggleButton = false;
-    String buttonStatus = "";
+    private boolean toggleButtonStatus = false;
+    private boolean toggleButton = false;
+    private String buttonStatus = "";
 
     JoystickHardware() {
 
@@ -18,9 +18,9 @@ public class JoystickHardware extends SensorHardware {
      * Toggle Joystick Button Method
      ******************************/
 
-    public String toggleJoystickButton(boolean joystickButton, String onStatus, String offStatus) {
+    String toggleJoystickButton(boolean joystickButton, String onStatus, String offStatus) {
         if (joystickButton && !toggleButton) {
-
+            toggleButton = true;
             toggleButtonStatus = !toggleButtonStatus;
 
             if (toggleButtonStatus) {
@@ -32,7 +32,6 @@ public class JoystickHardware extends SensorHardware {
                 buttonStatus = offStatus;      //Telemetry data variable
             }
 
-            toggleButton = true;
 
         } else if (!joystickButton) {
             toggleButton = false;
@@ -41,5 +40,5 @@ public class JoystickHardware extends SensorHardware {
         return buttonStatus;
 
     }
-    /********************* End Toggle Button on Joystick Method*******************************/
+
 }
