@@ -9,8 +9,10 @@ import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 /**
  * Created by Austin Ford & Tristan Sorenson on 12/15/2016.
  *
+ * Purpose: To map and initialize all DC motors on the robot.  The class also contains all of the
+ * methods to drive the motors.
+ *
  */
-
 
 class DcMotorHardware {
 
@@ -20,7 +22,8 @@ class DcMotorHardware {
     private DcMotor leftRearMotor;
     private DcMotor leftParticleMotor;
     private DcMotor rightParticleMotor;
-    private DcMotor mastLiftMotor;
+    private DcMotor leftMastLiftMotor;
+    private DcMotor rightMastLiftMotor;
 
     //Telemetry Variables
     String leftFrontMotorStatus = "null";
@@ -29,7 +32,8 @@ class DcMotorHardware {
     String rightRearMotorStatus = "null";
     String leftParticleMotorStatus = "null";
     String rightParticleMotorStatus = "null";
-    String mastLiftMotorStatus = "null";
+    private String leftMastLiftMotorStatus = "null";
+    private String rightMastLiftMotorStatus = "null";
 
     //DCMotorHardware Class Constructor
     DcMotorHardware() {
@@ -106,12 +110,21 @@ class DcMotorHardware {
         }
 
         try {
-            mastLiftMotor = hwMap.dcMotor.get("mast_lift_motor");
-            mastLiftMotorStatus = "Initialized";
+            leftMastLiftMotor = hwMap.dcMotor.get("left_mast_lift_motor");
+            leftMastLiftMotorStatus = "Initialized";
         } catch (Exception errorMessage) {
             DbgLog.msg(errorMessage.getLocalizedMessage());
-            mastLiftMotor = null;
-            mastLiftMotorStatus = "Failed to Initialize";
+            leftMastLiftMotor = null;
+            leftMastLiftMotorStatus = "Failed to Initialize";
+        }
+
+        try {
+            rightMastLiftMotor = hwMap.dcMotor.get("right_mast_lift_motor");
+            rightMastLiftMotorStatus = "Initialized";
+        } catch (Exception errorMessage) {
+            DbgLog.msg(errorMessage.getLocalizedMessage());
+            rightMastLiftMotor = null;
+            rightMastLiftMotorStatus = "Failed to Initialize";
         }
     }
 
@@ -123,13 +136,31 @@ class DcMotorHardware {
         rightFrontMotor.setPower(rightDCMotorPower);
     }
 
+    /**
+     * Purpose: Toggle the particle shooter motors on or off (To spin the 4" particle shooter wheels
+     * <p>
+     * Paramter values are currelnt statically passed as the particle shooter is operated with a toggle
+     * button.  The particle shooter is either on or off but not a variable speed.
+     *
+     * @param leftParticleMotorPower  - Variable type double - Can contain values 0.0 - 1.0
+     * @param rightParticleMotorPower - Variable type double - Can contain values 0.0 - 1.0
+     */
     void toggleParticleShooterMotors(double leftParticleMotorPower, double rightParticleMotorPower) {
         leftParticleMotor.setPower(leftParticleMotorPower);
         rightParticleMotor.setPower(rightParticleMotorPower);
     }
 
+    /**
+     * Purpose:  Raise and lower the forklift mast
+     *
+     * @param mastLiftDCMotorPower - Uses the value of the triggers on gamepad 1 - Can be 0.0 - 1.0
+     *
+     * Since parameter values are passed by the triggers, the value of the parameter can vary
+     *between 0.0 - 1.0, it is determined on how far the trigger is pressed.
+     */
     void driveMastLift(float mastLiftDCMotorPower) {
-        mastLiftMotor.setPower(mastLiftDCMotorPower);
+        leftMastLiftMotor.setPower(mastLiftDCMotorPower);
+        rightMastLiftMotor.setPower(mastLiftDCMotorPower);
     }
 
 }
