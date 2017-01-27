@@ -32,8 +32,8 @@ class DcMotorHardware {
     String rightRearMotorStatus = "null";
     String leftParticleMotorStatus = "null";
     String rightParticleMotorStatus = "null";
-    private String leftMastLiftMotorStatus = "null";
-    private String rightMastLiftMotorStatus = "null";
+    String leftMastLiftMotorStatus = "null";
+    String rightMastLiftMotorStatus = "null";
 
     //DCMotorHardware Class Constructor
     DcMotorHardware() {

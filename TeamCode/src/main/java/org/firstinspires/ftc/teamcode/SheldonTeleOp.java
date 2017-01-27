@@ -34,7 +34,9 @@ public class SheldonTeleOp extends OpMode {
         telemetry.addData("Right Rear DC Motor", sheldon.rightRearMotorStatus);
         telemetry.addData("Left Particle DC Motor", sheldon.leftParticleMotorStatus);
         telemetry.addData("Right Particle DC Motor", sheldon.rightParticleMotorStatus);
-        telemetry.addData("Mast Lift Motor", sheldon.mastLiftMotorStatus);
+        telemetry.addData("Left Mast Lift Motor", sheldon.leftMastLiftMotorStatus);
+        telemetry.addData("Right Mast Lift Motor", sheldon.rightMastLiftMotorStatus);
+
         updateTelemetry(telemetry);
     }
 
