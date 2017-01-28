@@ -153,8 +153,12 @@ public class SheldonTeleOp extends OpMode {
         /******************** End of Toggle Particle Shooter Motors On/Off ************************/
 
         /**************************** Start Raise Mast Routine ************************************/
-        sheldon.driveMastLift(gamepad1.right_trigger);  //Raise Mast Lift
-        sheldon.driveMastLift(gamepad1.left_trigger);   //Lower Mast Lift
+        sheldon.driveMastLiftUp(gamepad1.right_trigger);  //Raise Mast Lift
+        sheldon.driveMastLiftDown(gamepad1.left_trigger);   //Lower Mast Lift
+
+        sheldon.driveMastLiftUp(-gamepad2.right_trigger);  //Raise Mast Lift
+        sheldon.driveMastLiftDown(-gamepad2.left_trigger);   //Lower Mast Lift
+        //sheldon.driveMastLift(gamepad1.left_stick_x);
         /**************************** End of Raise Mast Routine ***********************************/
 
         /*******************Telemetry for TeleOp Mode while Running ******************************/

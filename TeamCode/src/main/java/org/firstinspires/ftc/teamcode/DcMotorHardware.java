@@ -111,6 +111,7 @@ class DcMotorHardware {
 
         try {
             leftMastLiftMotor = hwMap.dcMotor.get("left_mast_lift_motor");
+            leftMastLiftMotor.setDirection(REVERSE);
             leftMastLiftMotorStatus = "Initialized";
         } catch (Exception errorMessage) {
             DbgLog.msg(errorMessage.getLocalizedMessage());
@@ -120,6 +121,7 @@ class DcMotorHardware {
 
         try {
             rightMastLiftMotor = hwMap.dcMotor.get("right_mast_lift_motor");
+            rightMastLiftMotor.setDirection(REVERSE);
             rightMastLiftMotorStatus = "Initialized";
         } catch (Exception errorMessage) {
             DbgLog.msg(errorMessage.getLocalizedMessage());
@@ -153,14 +155,19 @@ class DcMotorHardware {
     /**
      * Purpose:  Raise and lower the forklift mast
      *
-     * @param mastLiftDCMotorPower - Uses the value of the triggers on gamepad 1 - Can be 0.0 - 1.0
+     * @param mastLiftDCMotorPowerUp - Uses the value of the triggers on gamepad 1 - Can be 0.0 - 1.0
      *
      * Since parameter values are passed by the triggers, the value of the parameter can vary
      *between 0.0 - 1.0, it is determined on how far the trigger is pressed.
      */
-    void driveMastLift(float mastLiftDCMotorPower) {
-        leftMastLiftMotor.setPower(mastLiftDCMotorPower);
-        rightMastLiftMotor.setPower(mastLiftDCMotorPower);
+    void driveMastLiftUp(float mastLiftDCMotorPowerUp) {
+        leftMastLiftMotor.setPower(mastLiftDCMotorPowerUp);
+        rightMastLiftMotor.setPower(mastLiftDCMotorPowerUp);
+    }
+
+    void driveMastLiftDown(float mastLiftDCMotorPowerDown) {
+        leftMastLiftMotor.setPower(mastLiftDCMotorPowerDown);
+        rightMastLiftMotor.setPower(mastLiftDCMotorPowerDown);
     }
 
 }

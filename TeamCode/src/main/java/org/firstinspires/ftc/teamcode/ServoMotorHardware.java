@@ -75,12 +75,14 @@ class ServoMotorHardware extends DcMotorHardware {
         //Fork Deploy Servo Motor Initialization - These are standard 180 degree Servos
         try {
             leftForkServo = hwMap.servo.get("left_fork_deploy_servo");
+            leftForkServo.setPosition(0);
         } catch (Exception errorMessage) {
             leftForkServo = null;
         }
 
         try {
             rightForkServo = hwMap.servo.get("right_fork_deploy_servo");
+            rightForkServo.setPosition(0);
         } catch (Exception errorMessage) {
             rightForkServo = null;
         }
