@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.ftccommon.DbgLog;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.Range;
 
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 
@@ -16,12 +17,12 @@ import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 
 class DcMotorHardware {
 
-    private DcMotor rightFrontMotor;
-    private DcMotor rightRearMotor;
-    private DcMotor leftFrontMotor;
-    private DcMotor leftRearMotor;
-    private DcMotor leftParticleMotor;
-    private DcMotor rightParticleMotor;
+    protected DcMotor rightFrontMotor;
+    protected DcMotor rightRearMotor;
+    protected DcMotor leftFrontMotor;
+    protected DcMotor leftRearMotor;
+    protected DcMotor leftParticleMotor;
+    protected DcMotor rightParticleMotor;
     private DcMotor leftMastLiftMotor;
     private DcMotor rightMastLiftMotor;
 
@@ -130,7 +131,7 @@ class DcMotorHardware {
         }
     }
 
-
+    //Method to Drive Robot
     void driveRobot(double leftDCMotorPower, double rightDCMotorPower) {
         leftRearMotor.setPower(leftDCMotorPower);
         rightRearMotor.setPower(rightDCMotorPower);

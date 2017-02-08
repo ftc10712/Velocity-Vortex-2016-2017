@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Created by Austin Ford & Tristan Sorenson on 12/19/2016.
  */
 
-@Autonomous(name = "Autonomous: Sheldon", group = "Autonomous")
+@Autonomous(name = "Sheldon Iterative", group = "Autonomous")
 
 public class SheldonAutonomous extends OpMode {
 
@@ -47,6 +47,9 @@ public class SheldonAutonomous extends OpMode {
         telemetry.addData("Right Beacon Servo", sheldon.getRightBeaconServoStatus());
         telemetry.addData("Optical Distance Sensor 1", sheldon.getOpticalDistanceSensor1Status());
         telemetry.addData("Optical Distance Sensor 2", sheldon.getOpticalDistanceSensor2Status());
+        telemetry.addData("Optical Distance 1 Normal Light", "%.2f", sheldon.getOpticalDistanceSensor1NormalLightDetected());
+        telemetry.addData("Optical Distance 2 Normal Light", "%.2f", sheldon.getOpticalDistanceSensor2NormalLightDetected());
+        telemetry.addData("Right Beacon Servo Position", "%.2f", sheldon.rightBeaconServo.getPosition());
         telemetry.addData("Touch Sensor", sheldon.getTouchSensorStatus());
         telemetry.addData("Color Sensor 1", sheldon.getColorSensor1Status());
         telemetry.addData("Color Sensor 2", sheldon.getColorSensor2Status());
@@ -58,7 +61,7 @@ public class SheldonAutonomous extends OpMode {
     public void loop() {
         // Sample Code Not Production
         if (sheldon.getColorSensor1ColorDetected() == TEAM_COLOR && sheldon.getColorSensor2ColorDetected() != TEAM_COLOR) {
-            if (sheldon.leftBeaconServo.getPosition() < .1) {  //Assume left beacon servo motor is retracted
+            if (sheldon.leftBeaconServo.getPosition() <= sheldon.leftBeaconServoCalibratedMin) {  //Assume left beacon servo motor is retracted
                 while (sheldon.getColorSensor1ColorDetected() == TEAM_COLOR && sheldon.getColorSensor2ColorDetected() != TEAM_COLOR) {
                     sheldon.deployLeftBeaconServo();
                     //Add code to drive motors here
@@ -68,8 +71,8 @@ public class SheldonAutonomous extends OpMode {
             }
 
         } else if (sheldon.getColorSensor1ColorDetected() != TEAM_COLOR && sheldon.getColorSensor2ColorDetected() == TEAM_COLOR) {
-            if (sheldon.rightBeaconServo.getPosition() < .1) {  //Assume left beacon servo motor is retracted
-                sheldon.deployRightBeaconServo();
+            if (sheldon.rightBeaconServo.getPosition() <= .16) {  //Assume left beacon servo motor is retracted
+                //sheldon.deployRightBeaconServo();
                 while (sheldon.getColorSensor1ColorDetected() != TEAM_COLOR && sheldon.getColorSensor2ColorDetected() == TEAM_COLOR) {
                     sheldon.deployRightBeaconServo();
                     //Add code to drive motors here
@@ -95,7 +98,10 @@ public class SheldonAutonomous extends OpMode {
         telemetry.addData("Color Sensor 1 Detected ", sheldon.getColorSensor1ColorDetected());
         telemetry.addData("Color Sensor 2 Detected ", sheldon.getColorSensor2ColorDetected());
         telemetry.addData("Optical Distance 1 Raw Light", "%.2f", sheldon.getOpticalDistanceSensor1RawLightDetected());
-        telemetry.addData("Optical Distance 1 Normal Light", "%.2f", sheldon.getOpticalDistanceSensor1NormalLightDettected());
+        telemetry.addData("Optical Distance 1 Normal Light", "%.2f", sheldon.getOpticalDistanceSensor1NormalLightDetected());
+        telemetry.addData("Optical Distance 2 Raw Light", "%.2f", sheldon.getOpticalDistanceSensor2RawLightDetected());
+        telemetry.addData("Optical Distance 2 Normal Light", "%.2f", sheldon.getOpticalDistanceSensor2NormalLightDetected());
+        telemetry.addData("Right Beacon Servo Position", "%.2f", sheldon.rightBeaconServo.getPosition());
         telemetry.addData("Color Beacon: ", beaconActivated);
         updateTelemetry(telemetry);
     }

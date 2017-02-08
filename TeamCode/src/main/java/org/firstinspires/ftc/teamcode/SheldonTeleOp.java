@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -10,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  */
 
 @TeleOp(name = "TeleOp: Sheldon", group = "TeleOP")
+@Disabled
 
 public class SheldonTeleOp extends OpMode {
 
@@ -99,12 +101,12 @@ public class SheldonTeleOp extends OpMode {
 
         if (gamepad1.dpad_up) {
             mastDirectionToMove = "FORWARD";    //Telemetry variable
-            sheldon.mastServoMove(mastDirectionToMove, mastServoSpeed);
+            //sheldon.mastServoMove(mastDirectionToMove, mastServoSpeed);
         } else if (gamepad1.dpad_down) {
             mastDirectionToMove = "REVERSE";    //Telemetry variable
-            sheldon.mastServoMove(mastDirectionToMove, mastServoSpeed);
+            //sheldon.mastServoMove(mastDirectionToMove, mastServoSpeed);
         } else {
-            sheldon.mastServoStop();
+            //sheldon.mastServoStop();
             mastDirectionToMove = "STOPPED";    //Telemetry variable
         }
         /**********************End of Mast Moving Forward or Reverse Routine********************/

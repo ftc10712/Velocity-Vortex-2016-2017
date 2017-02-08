@@ -23,6 +23,8 @@ class SensorHardware extends ServoMotorHardware {
     OpticalDistanceSensor opticalDistanceSensor2 = null;
     TouchSensor touchSensor = null;
 
+    float odsReadingAboveFloor = .42f;      //Take reading at competition location and change this
+    float odsReadingAboveWhiteLine = 1.00f; //Take reading at competition location and change this
 
     //Sample Code Being Worked On
 
@@ -139,8 +141,18 @@ class SensorHardware extends ServoMotorHardware {
     }
 
     //Get the normal light value that Optical Distance Sensor 1 is currently seeing
-    double getOpticalDistanceSensor1NormalLightDettected() {
+    double getOpticalDistanceSensor1NormalLightDetected() {
         return opticalDistanceSensor1.getLightDetected();
+    }
+
+    //Get the raw light value that Optical Distance Sensor 2 is currently seeing
+    double getOpticalDistanceSensor2RawLightDetected() {
+        return opticalDistanceSensor2.getRawLightDetected();
+    }
+
+    //Get the normal light value that Optical Distance Sensor 2 is currently seeing
+    double getOpticalDistanceSensor2NormalLightDetected() {
+        return opticalDistanceSensor2.getLightDetected();
     }
 
     //Turn on Optical Distance Sensor 1 LED Example

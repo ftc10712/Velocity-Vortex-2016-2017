@@ -23,22 +23,29 @@ class ServoMotorHardware extends DcMotorHardware {
     float leftForkServoCalibratedMax = .94f;     //Modern Robotics updated firmware to go beyond
     //130 degrees.  This calibrates the servo to turn
     //180 degrees. Change min and max to suit servos
+
     private Servo rightForkServo;
-    float rightForkServoCalibratedMin = 0f;
-    float rightForkServoCalibratedMax = .96f;    //Modern Robotics updated firmware to go beyond
+    float rightForkServoCalibratedMin = .96f;
+    float rightForkServoCalibratedMax = 0f;    //Modern Robotics updated firmware to go beyond
     //130 degrees.  This calibrates the servo to turn
     //180 degrees.  Change min and max to suit servos
 
-    private CRServo leftMastHorizontalServo;
-    private CRServo rightMastHorizontalServo;
-
-
+    //private CRServo leftMastHorizontalServo;
+    //private CRServo rightMastHorizontalServo;
 
 
 
     //Member Variables for Servos on Servo Controller A104ORQT
+
     protected Servo leftBeaconServo;
+    float leftBeaconServoCalibratedMax = 0f;
+    float leftBeaconServoCalibratedMin = .67f;
+
+
     protected Servo rightBeaconServo;
+    float rightBeaconServoCalibratedMin = .14f;
+    float rightBeaconServoCalibratedMax = .85f;
+
 
     //ServoMotorHardware Class Constructor
     ServoMotorHardware() {
@@ -75,46 +82,46 @@ class ServoMotorHardware extends DcMotorHardware {
         //Fork Deploy Servo Motor Initialization - These are standard 180 degree Servos
         try {
             leftForkServo = hwMap.servo.get("left_fork_deploy_servo");
-            leftForkServo.setPosition(0);
+            leftForkServo.setPosition(leftForkServoCalibratedMin);
         } catch (Exception errorMessage) {
             leftForkServo = null;
         }
 
         try {
             rightForkServo = hwMap.servo.get("right_fork_deploy_servo");
-            rightForkServo.setPosition(0);
+            rightForkServo.setPosition(rightForkServoCalibratedMin);
         } catch (Exception errorMessage) {
             rightForkServo = null;
         }
 
         //Mast Servo Motor Initialization - These are Continuous Rotation Servos
-        try {
-            leftMastHorizontalServo = hwMap.crservo.get("left_mast_horizontal_servo");
-            leftMastHorizontalServo.setDirection(FORWARD);
-        } catch (Exception errorMessage) {
-            leftMastHorizontalServo = null;
-        }
-
-        try {
-            rightMastHorizontalServo = hwMap.crservo.get("right_mast_horizontal_servo");
-            rightMastHorizontalServo.setDirection(REVERSE);
-        } catch (Exception errorMessage) {
-            rightMastHorizontalServo = null;
-        }
+//        try {
+//            leftMastHorizontalServo = hwMap.crservo.get("left_mast_horizontal_servo");
+//            leftMastHorizontalServo.setDirection(FORWARD);
+//        } catch (Exception errorMessage) {
+//            leftMastHorizontalServo = null;
+//        }
+//
+//        try {
+//            rightMastHorizontalServo = hwMap.crservo.get("right_mast_horizontal_servo");
+//            rightMastHorizontalServo.setDirection(REVERSE);
+//        } catch (Exception errorMessage) {
+//            rightMastHorizontalServo = null;
+//        }
 
         //---------------End Servos Assigned to Servo Controller AI02QSMX-------------------------//
 
         //------------------Servos Assigned to Servo Controller A104ORQT_-------------------------//
         try {
             leftBeaconServo = hwMap.servo.get("left_beacon_servo");
-            leftBeaconServo.setPosition(0);
+            leftBeaconServo.setPosition(leftBeaconServoCalibratedMin);
         } catch (Exception errorMessage) {
             leftBeaconServo = null;
         }
 
         try {
             rightBeaconServo = hwMap.servo.get("right_beacon_servo");
-            rightBeaconServo.setPosition(0);
+            rightBeaconServo.setPosition(rightBeaconServoCalibratedMin);
         } catch (Exception errorMessage) {
             rightBeaconServo = null;
         }
@@ -151,25 +158,25 @@ class ServoMotorHardware extends DcMotorHardware {
         rightForkGripperServo.setPower(0);
     }
 
-    //Method to move the mast servos forward and reverse
-    void mastServoMove(String directionToMove, double mastServoSpeed) {
-
-        if (directionToMove.equals("FORWARD")) {
-
-            leftMastHorizontalServo.setPower(mastServoSpeed);
-            rightMastHorizontalServo.setPower(mastServoSpeed - .1);
-
-        } else if (directionToMove.equals("REVERSE")) {
-
-            leftMastHorizontalServo.setPower(-mastServoSpeed);
-            rightMastHorizontalServo.setPower(-mastServoSpeed - .1);
-        }
-    }
-
-    void mastServoStop() {
-        leftMastHorizontalServo.setPower(0);
-        rightMastHorizontalServo.setPower(0);
-    }
+//    //Method to move the mast servos forward and reverse
+//    void mastServoMove(String directionToMove, double mastServoSpeed) {
+//
+//        if (directionToMove.equals("FORWARD")) {
+//
+//            leftMastHorizontalServo.setPower(mastServoSpeed);
+//            rightMastHorizontalServo.setPower(mastServoSpeed - .1);
+//
+//        } else if (directionToMove.equals("REVERSE")) {
+//
+//            leftMastHorizontalServo.setPower(-mastServoSpeed);
+//            rightMastHorizontalServo.setPower(-mastServoSpeed - .1);
+//        }
+//    }
+//
+//    void mastServoStop() {
+//        leftMastHorizontalServo.setPower(0);
+//        rightMastHorizontalServo.setPower(0);
+//    }
 
 
     //Method to check the status of left and right beacon servos
@@ -195,20 +202,20 @@ class ServoMotorHardware extends DcMotorHardware {
 
     //Methods to Deploy Beacon Servos
     void deployLeftBeaconServo() {
-        leftBeaconServo.setPosition(.9);
+        leftBeaconServo.setPosition(leftBeaconServoCalibratedMax);
     }
 
     void deployRightBeaconServo() {
-        rightBeaconServo.setPosition(.92);
+        rightBeaconServo.setPosition(rightBeaconServoCalibratedMax);
     }
 
     //Methods to Retract Servo Beacons
     void retractLeftBeaconServo() {
-        leftBeaconServo.setPosition(0);
+        leftBeaconServo.setPosition(leftBeaconServoCalibratedMin);
     }
 
     void retractRightBeaconServo() {
-        rightBeaconServo.setPosition(0);
+        rightBeaconServo.setPosition(rightBeaconServoCalibratedMin);
     }
 
     //Methods to Deploy Fork Blade Servos
