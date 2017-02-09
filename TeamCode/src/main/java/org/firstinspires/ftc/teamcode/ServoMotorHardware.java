@@ -220,20 +220,24 @@ class ServoMotorHardware extends DcMotorHardware {
 
     //Methods to Deploy Fork Blade Servos
     void deployLeftForkBladeServo() {
+
         leftForkServo.setPosition(leftForkServoCalibratedMax);
     }
 
     void deployRightForkBladeServo() {
-        rightForkServo.setPosition(rightForkServoCalibratedMin);
+
+        rightForkServo.setPosition(rightForkServoCalibratedMax);
     }
 
     //Methods to Retract Fork Blade Servos
     void retractLeftForkBladeServo() {
+
         leftForkServo.setPosition(leftForkServoCalibratedMin);
     }
 
     void retractRightForkBladeServo() {
-        rightForkServo.setPosition(leftForkServoCalibratedMax);
+
+        rightForkServo.setPosition(rightForkServoCalibratedMin);
     }
 
 }

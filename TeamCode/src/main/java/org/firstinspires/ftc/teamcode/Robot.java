@@ -23,7 +23,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  *
  */
 
-class Robot extends JoystickHardware {
+class Robot extends SensorHardware {
 
     //Robot Class Constructor
     public Robot() {

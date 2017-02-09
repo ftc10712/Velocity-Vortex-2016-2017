@@ -11,15 +11,20 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  */
 
 @TeleOp(name = "TeleOp: Sheldon", group = "TeleOP")
-@Disabled
+//@Disabled
 
 public class SheldonTeleOp extends OpMode {
 
     private Robot sheldon = new Robot();            //New instance of our Robot Class we call Sheldon
+    private boolean toggleLeftJoystickButtonStatus = false;
+    private boolean toggleLeftJoystickButton = false;
     private String frontSideOfRobot = "Forklift";   //Default front side of robot is Forklift Side
     private String frontSideOfRobotStatus = "Forklift"; //Telemetry Variable
-    private String particleShooterStatus = "Off";
-    private String particleShooterToggle = "Off";
+
+    //Power variables for lifting the mast
+    private float mastLiftPowerUp = 1.0f;
+    private float mastLiftPowerDown = -1.0f;
+    private float mastLiftPowerStop = 0.0f;
 
 
     @Override
@@ -57,27 +62,43 @@ public class SheldonTeleOp extends OpMode {
         double leftDCMotorPower;            //Power Value for Left DC Drive Motors
         double rightDCMotorPower;           //Power Value for Right DC Drive Motors
 
-        //Call method in JoystickHardware Class to toggle a button on joystick
-        frontSideOfRobot = sheldon.toggleJoystickButton(gamepad1.left_stick_button, "Particle Shooter", "Forklift");
+        //Code to toggle which side of Robot is Facing Forward
+        if (gamepad1.left_stick_button && !toggleLeftJoystickButton) {
+            toggleLeftJoystickButton = true;
+            toggleLeftJoystickButtonStatus = !toggleLeftJoystickButtonStatus;
+
+            if (toggleLeftJoystickButtonStatus) {
+
+                frontSideOfRobot = "Particle Shooter";  //Telemetry data variable
+
+            } else {
+
+                frontSideOfRobot = "Forklift";      //Telemetry data variable
+            }
+
+        } else if (!gamepad1.left_stick_button) {
+
+            toggleLeftJoystickButton = false;
+
+        }
 
         //Drive the robot in the direction selected either Particle Shooter forward or Forklift Forward
         if (frontSideOfRobot == "Particle Shooter") {
             frontSideOfRobotStatus = "Paricle Shooter";
-            leftDCMotorPower = gamepad1.left_stick_y;
-            rightDCMotorPower = gamepad1.right_stick_y;
+            leftDCMotorPower = sheldon.scalePower(gamepad1.left_stick_y);
+            rightDCMotorPower = sheldon.scalePower(gamepad1.right_stick_y);
             sheldon.driveRobot(leftDCMotorPower, rightDCMotorPower);
 
         } else if (frontSideOfRobot == "Forklift") {
             frontSideOfRobotStatus = "Forklift";
-            leftDCMotorPower = -gamepad1.left_stick_y;
-            rightDCMotorPower = -gamepad1.right_stick_y;
+            leftDCMotorPower = sheldon.scalePower(-gamepad1.left_stick_y);
+            rightDCMotorPower = sheldon.scalePower(-gamepad1.right_stick_y);
             sheldon.driveRobot(leftDCMotorPower, rightDCMotorPower);
         }
         /**********************End of Driving Routine************************/
 
 
         /**********************Start of Gripper Moving Routine***************/
-
         //Gripper Servo Variables
         String gripperDirectionToMove = "Not Initialized";
         double gripperServoSpeed = 1.0; //Set Gripper Servo Speed 0.0-1.0
@@ -93,38 +114,17 @@ public class SheldonTeleOp extends OpMode {
         }
         /**********************End of Gripper Moving Routine*****************/
 
-        /**********************Start of Mast Moving Forward or Reverse Routine******************/
-
-        //Mast Servo Variables
-        String mastDirectionToMove = "Not Initialized";
-        double mastServoSpeed = 1.0;            //Set Mast Servo Speed 0.0-1.0
-
-        if (gamepad1.dpad_up) {
-            mastDirectionToMove = "FORWARD";    //Telemetry variable
-            //sheldon.mastServoMove(mastDirectionToMove, mastServoSpeed);
-        } else if (gamepad1.dpad_down) {
-            mastDirectionToMove = "REVERSE";    //Telemetry variable
-            //sheldon.mastServoMove(mastDirectionToMove, mastServoSpeed);
-        } else {
-            //sheldon.mastServoStop();
-            mastDirectionToMove = "STOPPED";    //Telemetry variable
-        }
-        /**********************End of Mast Moving Forward or Reverse Routine********************/
-
         /**********************Fork Deploy & Retract Routine************************************/
 
         //Fork Servo Variables
-        String positionOfForks = "Retracted";   //Default front side of robot is Forklift Side
         String statusOfForks = "Retracted";
 
-        positionOfForks = sheldon.toggleJoystickButton(gamepad1.a, "Deployed", "Retracted");
-
-        if (positionOfForks == "Deployed") {
+        if (gamepad1.b) {
             sheldon.deployLeftForkBladeServo();
             sheldon.deployRightForkBladeServo();
             statusOfForks = "Deployed";     //Sets Telemetry Variable
 
-        } else if (positionOfForks == "Retracted") {
+        } else if (gamepad1.x) {
             sheldon.retractLeftForkBladeServo();
             sheldon.retractRightForkBladeServo();
             statusOfForks = "Retracted";    //Sets Telemetry Variable
@@ -132,42 +132,42 @@ public class SheldonTeleOp extends OpMode {
 
         /**********************End Fork Deploy & Retract Routine********************************/
 
-        /******************** Toggle Particle Shooter Motors On/Off ************************/
-        double leftParticleMotorPower;            //Power Value for Left DC Drive Motors
-        double rightParticleMotorPower;           //Power Value for Right DC Drive Motors
+        /********************* Start Raise & Lower Mast Routine ********************************/
 
-        //Call method in JoystickHardware Class to toggle a button on joystick
-        particleShooterToggle = sheldon.toggleJoystickButton(gamepad2.a, "On", "Off");
+        if (gamepad1.y) {
+            sheldon.driveMastLiftPower(mastLiftPowerUp);
 
-        //Drive the robot in the direction selected either Particle Shooter forward or Forklift Forward
-        if (particleShooterToggle == "On") {
-            particleShooterStatus = "On";
-            leftParticleMotorPower = 1.0;
-            rightParticleMotorPower = 1.0;
-            sheldon.toggleParticleShooterMotors(leftParticleMotorPower, rightParticleMotorPower);
-
-        } else if (particleShooterToggle == "Off") {
-            particleShooterStatus = "Off";
-            leftParticleMotorPower = 0.0;
-            rightParticleMotorPower = 0.0;
-            sheldon.toggleParticleShooterMotors(leftParticleMotorPower, rightParticleMotorPower);
+        } else if (gamepad1.a) {
+            sheldon.driveMastLiftPower(mastLiftPowerDown);
+        } else {
+            sheldon.driveMastLiftPower(mastLiftPowerStop);
         }
-        /******************** End of Toggle Particle Shooter Motors On/Off ************************/
-
-        /**************************** Start Raise Mast Routine ************************************/
-        sheldon.driveMastLiftUp(gamepad1.right_trigger);  //Raise Mast Lift
-        sheldon.driveMastLiftDown(gamepad1.left_trigger);   //Lower Mast Lift
-
-        sheldon.driveMastLiftUp(-gamepad2.right_trigger);  //Raise Mast Lift
-        sheldon.driveMastLiftDown(-gamepad2.left_trigger);   //Lower Mast Lift
-        //sheldon.driveMastLift(gamepad1.left_stick_x);
         /**************************** End of Raise Mast Routine ***********************************/
+
+        /**********************Beacon Servo Deploy & Retract Routine*******************************/
+
+        //Fork Servo Variables
+        //String statusOfForks = "Retracted";
+
+        if (gamepad2.right_bumper) {
+            sheldon.deployLeftBeaconServo();
+        } else {
+            sheldon.retractLeftBeaconServo();
+        }
+
+        if (gamepad2.left_bumper) {
+            sheldon.deployRightBeaconServo();
+        } else {
+            sheldon.retractRightBeaconServo();
+        }
+
+        /********************End of Beacon Servo Deploy & Retract Routine**************************/
 
         /*******************Telemetry for TeleOp Mode while Running ******************************/
         telemetry.addData("Front Side Facing", frontSideOfRobotStatus);
         telemetry.addData("Position of Forks", statusOfForks);
-        telemetry.addData("Direction Mast Moving", mastDirectionToMove);
-        telemetry.addData("Particle Shooter Motors", particleShooterStatus);
+        //telemetry.addData("Direction Mast Moving", mastDirectionToMove);
+        //telemetry.addData("Particle Shooter Motors", particleShooterStatus);
         updateTelemetry(telemetry);
         /***************End of Telemetry for TeleOp Mode while Running ***************************/
 

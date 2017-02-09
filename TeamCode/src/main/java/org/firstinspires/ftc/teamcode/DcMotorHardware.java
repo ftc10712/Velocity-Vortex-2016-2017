@@ -112,7 +112,7 @@ class DcMotorHardware {
 
         try {
             leftMastLiftMotor = hwMap.dcMotor.get("left_mast_lift_motor");
-            leftMastLiftMotor.setDirection(REVERSE);
+            //leftMastLiftMotor.setDirection(REVERSE);
             leftMastLiftMotorStatus = "Initialized";
         } catch (Exception errorMessage) {
             DbgLog.msg(errorMessage.getLocalizedMessage());
@@ -122,7 +122,7 @@ class DcMotorHardware {
 
         try {
             rightMastLiftMotor = hwMap.dcMotor.get("right_mast_lift_motor");
-            rightMastLiftMotor.setDirection(REVERSE);
+            //rightMastLiftMotor.setDirection(REVERSE);
             rightMastLiftMotorStatus = "Initialized";
         } catch (Exception errorMessage) {
             DbgLog.msg(errorMessage.getLocalizedMessage());
@@ -161,14 +161,48 @@ class DcMotorHardware {
      * Since parameter values are passed by the triggers, the value of the parameter can vary
      *between 0.0 - 1.0, it is determined on how far the trigger is pressed.
      */
-    void driveMastLiftUp(float mastLiftDCMotorPowerUp) {
+    void driveMastLiftPower(float mastLiftDCMotorPowerUp) {
         leftMastLiftMotor.setPower(mastLiftDCMotorPowerUp);
         rightMastLiftMotor.setPower(mastLiftDCMotorPowerUp);
     }
 
-    void driveMastLiftDown(float mastLiftDCMotorPowerDown) {
-        leftMastLiftMotor.setPower(mastLiftDCMotorPowerDown);
-        rightMastLiftMotor.setPower(mastLiftDCMotorPowerDown);
-    }
+    //Scale Motor Power
+    float scalePower(float power) {
+        //
+        // Assume no scaling.
+        //
+        float l_scale = 0.0f;
 
+        //
+        // Ensure the values are legal.
+        //
+        float l_power = Range.clip(power, -1, 1);
+
+        float[] l_array =
+                {0.00f, 0.03f, 0.06f, 0.9f, 0.12f
+                        , 0.15f, 0.18f, 0.21f, 0.24f, 0.27f
+                        , 0.30f, 0.35f, 0.50f, 0.65f, 0.85f
+                        , 1.00f, 1.00f
+                };
+
+
+        //
+        // Get the corresponding index for the specified argument/parameter.
+        //
+        int l_index = (int) (l_power * 16.0);
+        if (l_index < 0) {
+            l_index = -l_index;
+        } else if (l_index > 16) {
+            l_index = 16;
+        }
+
+        if (l_power < 0) {
+            l_scale = -l_array[l_index];
+        } else {
+            l_scale = l_array[l_index];
+        }
+
+        return l_scale;
+
+    } // scale_motor_power
 }
