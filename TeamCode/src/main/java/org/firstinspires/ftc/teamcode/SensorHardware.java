@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.I2cAddr;
@@ -22,6 +23,7 @@ class SensorHardware extends ServoMotorHardware {
     OpticalDistanceSensor opticalDistanceSensor1 = null;
     OpticalDistanceSensor opticalDistanceSensor2 = null;
     TouchSensor touchSensor = null;
+    ModernRoboticsI2cGyro gyro = null;
 
     float odsReadingAboveFloor = .42f;      //Take reading at competition location and change this
     float odsReadingAboveWhiteLine = 1.00f; //Take reading at competition location and change this
@@ -37,6 +39,12 @@ class SensorHardware extends ServoMotorHardware {
     void initializeSensors(HardwareMap hwMap) {
 
         //Initialize and Map Color Sensor
+        try {
+            gyro = (ModernRoboticsI2cGyro) hwMap.gyroSensor.get("mr_gyro");
+        } catch (Exception p_exception) {
+            gyro = null;
+        }
+
         try {
             colorSensor1 = hwMap.colorSensor.get("mr_color_sensor1");
         } catch (Exception p_exception) {

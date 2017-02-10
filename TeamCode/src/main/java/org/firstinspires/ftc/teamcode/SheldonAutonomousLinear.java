@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @Autonomous(name = "Sheldon Linear", group = "Autonomous")
-//@Disabled
+@Disabled
 public class SheldonAutonomousLinear extends LinearOpMode {
 
     @Override

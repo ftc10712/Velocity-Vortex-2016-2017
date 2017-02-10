@@ -47,4 +47,10 @@ class Robot extends SensorHardware {
         initializeSensors(hwMap);
     }
 
+    void initializeRobotAutonomous(HardwareMap hwMap) {
+        initializeDCMotorsAutonomous(hwMap);
+        initializeServoMotors(hwMap);
+        initializeSensors(hwMap);
+    }
+
 }

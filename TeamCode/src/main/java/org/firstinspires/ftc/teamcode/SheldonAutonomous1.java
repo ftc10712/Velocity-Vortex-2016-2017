@@ -40,62 +40,53 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 
-/**
- * This file illustrates the concept of driving a path based on Gyro heading and encoder counts.
- * It uses the common Pushbot hardware class to define the drive on the robot.
- * The code is structured as a LinearOpMode
- * <p>
- * The code REQUIRES that you DO have encoders on the wheels,
- * otherwise you would use: PushbotAutoDriveByTime;
- * <p>
- * This code ALSO requires that you have a Modern Robotics I2C gyro with the name "gyro"
- * otherwise you would use: PushbotAutoDriveByEncoder;
- * <p>
- * This code requires that the drive Motors have been configured such that a positive
- * power command moves them forward, and causes the encoders to count UP.
- * <p>
- * This code uses the RUN_TO_POSITION mode to enable the Motor controllers to generate the run profile
- * <p>
- * In order to calibrate the Gyro correctly, the robot must remain stationary during calibration.
- * This is performed when the INIT button is pressed on the Driver Station.
- * This code assumes that the robot is stationary when the INIT button is pressed.
- * If this is not the case, then the INIT should be performed again.
- * <p>
- * Note: in this example, all angles are referenced to the initial coordinate frame set during the
- * the Gyro Calibration process, or whenever the program issues a resetZAxisIntegrator() call on the Gyro.
- * <p>
- * The angle of movement/rotation is assumed to be a standardized rotation around the robot Z axis,
- * which means that a Positive rotation is Counter Clock Wise, looking down on the field.
- * This is consistent with the FTC field coordinate conventions set out in the document:
- * ftc_app\doc\tutorial\FTC_FieldCoordinateSystemDefinition.pdf
- * <p>
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
-
-@Autonomous(name = "Sheldon: Auto Drive By Gyro", group = "Sheldon")
+@Autonomous(name = "Sheldon: Two Beacon Autonomous", group = "Robot Position 1")
 //@Disabled
-public class SheldonAutonomous2 extends LinearOpMode {
+public class SheldonAutonomous1 extends LinearOpMode {
 
-    /* Declare OpMode members. */
-    Robot sheldon = new Robot();   // Use a Sheldon's hardware
-    ModernRoboticsI2cGyro gyro = null;                    // Additional Gyro device
+    /********************
+     * Declare OpMode Member Variables
+     ********************************************/
 
-    static final double COUNTS_PER_MOTOR_REV = 1680;    // eg: TETRIX Motor Encoder
-    static final double DRIVE_GEAR_REDUCTION = 1.0;     // This is < 1.0 if geared UP
-    static final double WHEEL_DIAMETER_INCHES = 4.0;     // For figuring circumference
+    Robot sheldon = new Robot();                      // Use a Sheldon's hardware
+
+    ModernRoboticsI2cGyro gyro = null;                // Additional Gyro device
+
+    //Calculate Encder Ticks for Motors
+    static final double COUNTS_PER_MOTOR_REV = 1680;  // eg: AndyMark Motor Encoder
+    static final double DRIVE_GEAR_REDUCTION = 1.0;   // This is < 1.0 if geared UP
+    static final double WHEEL_DIAMETER_INCHES = 4.0;  // For figuring circumference
     static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
 
     // These constants define the desired driving/control characteristics
     // The can/should be tweaked to suite the specific robot drive train.
-    static final double DRIVE_SPEED = 0.7;     // Nominal speed for better accuracy.
-    static final double TURN_SPEED = 0.5;     // Nominal half speed for better accuracy.
+    static final double DRIVE_SPEED = 0.7;      // Nominal speed for better accuracy.
+    static final double TURN_SPEED = 0.5;       // Nominal half speed for better accuracy.
 
     static final double HEADING_THRESHOLD = 1;      // As tight as we can make it with an integer gyro
-    static final double P_TURN_COEFF = 0.1;     // Larger is more responsive, but also less stable
-    static final double P_DRIVE_COEFF = 0.15;     // Larger is more responsive, but also less stable
+    static final double P_TURN_COEFF = 0.1;         // Larger is more responsive, but also less stable
+    static final double P_DRIVE_COEFF = 0.15;       // Larger is more responsive, but also less stable
 
+
+    //These variables are used to determine what team the robot is currently assigned to.
+    String TEAM_COLOR = "Red";
+    double teamColorCoefficient = 1.0;
+
+    //This variable determines if the beacon was activated
+    String beaconActivated = "Not Activated";
+
+    //These variables are used when using the Optical Distance Sensors to find white lines
+    double ods1WhiteLineThreshold = 0.36;           // Measure the optical distance sensor 1 value above
+    // grey mat then over white line, add together
+    // and divide by 2 to get this value
+
+    double ods2WhiteLineThreshold = 0.33;           // Measure the optical distance sensor 2 value above
+    // grey mat then over white line, add together
+    // and divide by 2 to get this value
+    double whiteLineCorrection;
+
+    /*********************** End of OpMode Member Variables ***************************************/
 
     @Override
     public void runOpMode() {
@@ -104,12 +95,18 @@ public class SheldonAutonomous2 extends LinearOpMode {
          * Initialize the standard drive system variables.
          * The init() method of the hardware class does most of the work here
          */
-        sheldon.initializeRobot(hardwareMap);
+
+        //We had to create a new class to initialize the robot in Autonomous mode because it
+        //drives backwards from our normal mode
+        sheldon.initializeRobotAutonomous(hardwareMap);
+
+        //Locally assign gyro instead of using sensor map
         gyro = (ModernRoboticsI2cGyro) hardwareMap.gyroSensor.get("mr_gyro");
 
         // Ensure the robot it stationary, then reset the encoders and calibrate the gyro.
-        sheldon.leftRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        sheldon.rightRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        sheldon.leftFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        sheldon.rightFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
 
         // Send telemetry message to alert driver that we are calibrating;
         telemetry.addData(">", "Calibrating Gyro");    //
@@ -117,7 +114,7 @@ public class SheldonAutonomous2 extends LinearOpMode {
 
         gyro.calibrate();
 
-        // make sure the gyro is calibrated before continuing
+        // Don't move until gyro is calibrated
         while (!isStopRequested() && gyro.isCalibrating()) {
             sleep(50);
             idle();
@@ -126,37 +123,67 @@ public class SheldonAutonomous2 extends LinearOpMode {
         telemetry.addData(">", "Robot Ready.");    //
         telemetry.update();
 
-        sheldon.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        sheldon.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        sheldon.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        sheldon.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Wait for the game to start (Display Gyro value), and reset gyro before we move..
         while (!isStarted()) {
+
+            //Use gamepad1 to assign which team color robot is on x button for blue, b button for red
+            if (gamepad1.x == true) {
+                TEAM_COLOR = "Blue";
+                teamColorCoefficient = -1.0;
+            } else if (gamepad1.b == true) {
+                TEAM_COLOR = "Red";
+                teamColorCoefficient = 1.0;
+            }
+
+            //Add telemetry so we can see if our hardware is working properly
             telemetry.addData(">", "Robot Heading = %d", gyro.getIntegratedZValue());
+            telemetry.addData("Current Team Color Selected", TEAM_COLOR);
+            telemetry.addData("Left Beacon Servo", sheldon.getLeftBeaconServoStatus());
+            telemetry.addData("Right Beacon Servo", sheldon.getRightBeaconServoStatus());
+            telemetry.addData("Optical Distance Sensor 1", sheldon.getOpticalDistanceSensor1Status());
+            telemetry.addData("Optical Distance Sensor 2", sheldon.getOpticalDistanceSensor2Status());
+            telemetry.addData("Optical Distance 1 Normal Light", "%.2f", sheldon.getOpticalDistanceSensor1NormalLightDetected());
+            telemetry.addData("Optical Distance 2 Normal Light", "%.2f", sheldon.getOpticalDistanceSensor2NormalLightDetected());
+            telemetry.addData("Right Beacon Servo Position", "%.2f", sheldon.rightBeaconServo.getPosition());
+            telemetry.addData("Touch Sensor", sheldon.getTouchSensorStatus());
+            telemetry.addData("Color Sensor 1", sheldon.getColorSensor1Status());
+            telemetry.addData("Color Sensor 2", sheldon.getColorSensor2Status());
             telemetry.update();
             idle();
         }
         gyro.resetZAxisIntegrator();
 
+        /*************************Here is where our Opmode Begins *********************************/
+
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
         // Put a hold after each turn
-        gyroDrive(DRIVE_SPEED, 27.0, 0.0);    // Drive FWD 48 inches
-        gyroTurn(TURN_SPEED, 68.0);         // Turn  CCW to -45 Degrees
-        gyroDrive(DRIVE_SPEED, 65.0, 0.0);
-        //gyroTurn(TURN_SPEED, 22.0);
-        //gyroDrive(DRIVE_SPEED, 12.0, 90.0);
-        //gyroHold( TURN_SPEED, -45.0, 0.5);    // Hold -45 Deg heading for a 1/2 second
-        //gyroTurn( TURN_SPEED,  45.0);         // Turn  CW  to  45 Degrees
-        //gyroHold( TURN_SPEED,  45.0, 0.5);    // Hold  45 Deg heading for a 1/2 second
-        //gyroTurn( TURN_SPEED,   0.0);         // Turn  CW  to   0 Degrees
-        //gyroHold( TURN_SPEED,   0.0, 1.0);    // Hold  0 Deg heading for a 1 second
-        //gyroDrive(DRIVE_SPEED,-48.0, 0.0);    // Drive REV 48 inches
-        //gyroHold( TURN_SPEED,   0.0, 0.5);    // Hold  0 Deg heading for a 1/2 second
+
+        //When init is pressed, the gyro will calibrate, then the driver coach must assign
+        //gamepad1 to the autonomous mode and select the x button if the team color is blue
+        //or b if the team color is red (those are the colors of the buttons on the gamepad)
+        //This will set the TEAM_COLOR variable and the teamColorCoefficient which will determine
+        //turns made regardless of which team is selected.
+
+        gyroDrive(DRIVE_SPEED, 15.0, (teamColorCoefficient * 0.0));   // Step A - Drive 15" on heading of 0 degrees
+        gyroTurn(TURN_SPEED, (teamColorCoefficient * 45.0));          // Step B - Turn to a heading of 45 degrees (left or right depending on color)
+        gyroHold(TURN_SPEED, (teamColorCoefficient * 45.0), 0.5);     // Step B Continued - Hold the heading and rest for .5 seconds for gyro to settle
+        gyroDrive(DRIVE_SPEED, 51.0, (teamColorCoefficient * 45.0));  // Step C -Drive 51" on heading of 45 degrees (left or right depending on color)
+        gyroTurn(TURN_SPEED, (teamColorCoefficient * 90.0));          // Step D - Turn to a heading of 90 degrees (left or right depending on color)
+        gyroHold(TURN_SPEED, (teamColorCoefficient * 90.0), 0.5);     // Step D Continued - Hold the heading and rest for .5 seconds for gyro to settle
+        lookForColorBeacon();                                       // Step E - Drive forward slowly looking for color beacon
+
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
     }
 
+    /*************************************End of RunOpMode ****************************************/
+
+    /************************************Start of Our Methods *************************************/
 
     /**
      * Method to drive on a fixed compass bearing (angle), based on encoder counts.
@@ -188,28 +215,29 @@ public class SheldonAutonomous2 extends LinearOpMode {
 
             // Determine new target position, and pass to motor controller
             moveCounts = (int) (distance * COUNTS_PER_INCH);
-            newLeftTarget = sheldon.leftRearMotor.getCurrentPosition() + moveCounts;
-            newRightTarget = sheldon.rightRearMotor.getCurrentPosition() + moveCounts;
+
+            newLeftTarget = sheldon.leftFrontMotor.getCurrentPosition() + moveCounts;
+            newRightTarget = sheldon.rightFrontMotor.getCurrentPosition() + moveCounts;
 
             // Set Target and Turn On RUN_TO_POSITION
-            sheldon.leftRearMotor.setTargetPosition(newLeftTarget);
-            sheldon.rightRearMotor.setTargetPosition(newRightTarget);
+            sheldon.leftFrontMotor.setTargetPosition(newLeftTarget);
+            sheldon.rightFrontMotor.setTargetPosition(newRightTarget);
 
-            sheldon.leftRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            sheldon.rightRearMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            sheldon.leftFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            sheldon.rightFrontMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            // start motion.
+            // Start Motors
             speed = Range.clip(Math.abs(speed), 0.0, 1.0);
             sheldon.leftFrontMotor.setPower(speed);
             sheldon.leftRearMotor.setPower(speed);
             sheldon.rightFrontMotor.setPower(speed);
-            sheldon.leftFrontMotor.setPower(speed);
+            sheldon.rightRearMotor.setPower(speed);
 
             // keep looping while we are still active, and BOTH motors are running.
             while (opModeIsActive() &&
-                    (sheldon.leftRearMotor.isBusy() && sheldon.rightRearMotor.isBusy())) {
+                    (sheldon.leftFrontMotor.isBusy() && sheldon.rightFrontMotor.isBusy())) {
 
-                // adjust relative speed based on heading error.
+                // Adjust relative speed based on heading error.
                 error = getError(angle);
                 steer = getSteer(error, P_DRIVE_COEFF);
 
@@ -217,8 +245,8 @@ public class SheldonAutonomous2 extends LinearOpMode {
                 if (distance < 0)
                     steer *= -1.0;
 
-                leftSpeed = speed - steer;
-                rightSpeed = speed + steer;
+                leftSpeed = speed - steer;//orig
+                rightSpeed = speed + steer;//orig
 
                 // Normalize speeds if any one exceeds +/- 1.0;
                 max = Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
@@ -228,28 +256,28 @@ public class SheldonAutonomous2 extends LinearOpMode {
                 }
 
                 sheldon.leftFrontMotor.setPower(leftSpeed);
-                sheldon.rightFrontMotor.setPower(leftSpeed);
                 sheldon.rightFrontMotor.setPower(rightSpeed);
+                sheldon.leftRearMotor.setPower(leftSpeed);
                 sheldon.rightRearMotor.setPower(rightSpeed);
 
                 // Display drive status for the driver.
                 telemetry.addData("Err/St", "%5.1f/%5.1f", error, steer);
                 telemetry.addData("Target", "%7d:%7d", newLeftTarget, newRightTarget);
-                telemetry.addData("Actual", "%7d:%7d", sheldon.leftRearMotor.getCurrentPosition(),
-                        sheldon.rightRearMotor.getCurrentPosition());
+                telemetry.addData("Actual", "%7d:%7d", sheldon.leftFrontMotor.getCurrentPosition(),
+                        sheldon.rightFrontMotor.getCurrentPosition());
                 telemetry.addData("Speed", "%5.2f:%5.2f", leftSpeed, rightSpeed);
                 telemetry.update();
             }
 
-            // Stop all motion;
+            // Stop all Motors
             sheldon.leftFrontMotor.setPower(0);
             sheldon.leftRearMotor.setPower(0);
             sheldon.rightFrontMotor.setPower(0);
             sheldon.rightRearMotor.setPower(0);
 
             // Turn off RUN_TO_POSITION
-            sheldon.leftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            sheldon.rightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            sheldon.leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            sheldon.rightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
     }
 
@@ -301,6 +329,45 @@ public class SheldonAutonomous2 extends LinearOpMode {
         sheldon.rightFrontMotor.setPower(0);
         sheldon.rightRearMotor.setPower(0);
     }
+
+    /**
+     * Method to begin turning and try to locate the edge of the white line
+     */
+    public void findWhiteLine() {
+        double drivePower = 0.2;
+        if (TEAM_COLOR == "Blue") {
+            while (sheldon.getOpticalDistanceSensor1NormalLightDetected() < ods1WhiteLineThreshold) {
+                sheldon.driveRobot(drivePower, -drivePower);
+            }
+        }
+
+        if (TEAM_COLOR == "Red") {
+            while (sheldon.getOpticalDistanceSensor2NormalLightDetected() < ods2WhiteLineThreshold) {
+                sheldon.driveRobot(-drivePower, drivePower);
+            }
+        }
+    }
+
+    public void followWhiteLine() {
+        double minimumSpeed, leftPower, rightPower;
+        minimumSpeed = .2;
+        while (true) {
+            if (TEAM_COLOR == "Blue") {
+                whiteLineCorrection = (ods1WhiteLineThreshold - sheldon.getOpticalDistanceSensor1NormalLightDetected());
+                if (whiteLineCorrection <= 0) {
+                    leftPower = minimumSpeed + whiteLineCorrection;
+                    rightPower = minimumSpeed;
+                } else {
+                    leftPower = minimumSpeed;
+                    rightPower = minimumSpeed - whiteLineCorrection;
+                }
+
+                sheldon.driveRobot(leftPower, rightPower);
+
+            }
+        }
+    }
+
 
     /**
      * Perform one cycle of closed loop heading control.
@@ -376,4 +443,49 @@ public class SheldonAutonomous2 extends LinearOpMode {
         return Range.clip(error * PCoeff, -1, 1);
     }
 
-}
+    /**
+     * Purpose:  Method to slowly approach beacons and deploy appropriate beacon pusher servo
+     * when successful, it will stop.
+     */
+    public void lookForColorBeacon() {
+        double leftApproachSpeed = .2;
+        double rightApproachSpeed = .15;
+
+        while (beaconActivated == "Not Activated") {
+            if (sheldon.getColorSensor1ColorDetected() == TEAM_COLOR && sheldon.getColorSensor2ColorDetected() != TEAM_COLOR) {
+                if (sheldon.leftBeaconServo.getPosition() <= sheldon.leftBeaconServoCalibratedMin) {  //Assume left beacon servo motor is retracted
+                    while (sheldon.getColorSensor1ColorDetected() == TEAM_COLOR && sheldon.getColorSensor2ColorDetected() != TEAM_COLOR) {
+                        sheldon.deployLeftBeaconServo();
+                    }
+
+                    sheldon.retractLeftBeaconServo();
+                }
+
+            } else if (sheldon.getColorSensor1ColorDetected() != TEAM_COLOR && sheldon.getColorSensor2ColorDetected() == TEAM_COLOR) {
+                if (sheldon.rightBeaconServo.getPosition() <= .16) {  //Assume left beacon servo motor is retracted
+
+                    while (sheldon.getColorSensor1ColorDetected() != TEAM_COLOR && sheldon.getColorSensor2ColorDetected() == TEAM_COLOR) {
+                        sheldon.deployRightBeaconServo();
+                    }
+
+                    sheldon.retractRightBeaconServo();
+                }
+
+            } else if (sheldon.getColorSensor1ColorDetected() == TEAM_COLOR && sheldon.getColorSensor2ColorDetected() == TEAM_COLOR) {
+                //If we have made it here, we have successfully tripped the beacon so stop motors
+                sheldon.driveRobot(0, 0);
+                sheldon.retractLeftBeaconServo();
+                sheldon.retractRightBeaconServo();
+                beaconActivated = "Successfully Activated!";
+
+            } else {
+                //Add code to slowly drive toward beacons continuing to look for beacons
+                sheldon.driveRobot(leftApproachSpeed, rightApproachSpeed);
+                sheldon.retractLeftBeaconServo();
+                sheldon.retractRightBeaconServo();
+            }
+
+        }
+    }
+
+}// End of Linear Op Mode
