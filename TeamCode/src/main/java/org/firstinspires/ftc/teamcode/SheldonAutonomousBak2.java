@@ -41,7 +41,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 
 @Autonomous(name = "Sheldon: Two Beacon Autonomous", group = "Robot Position 1")
-//@Disabled
+@Disabled
 public class SheldonAutonomousBak2 extends LinearOpMode {
 
     /********************************************

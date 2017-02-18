@@ -41,7 +41,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 
 @Autonomous(name = "Sheldon: Two Beacon Autonomous", group = "Robot Position 1")
-@Disabled
+//@Disabled
 public class SheldonAutonomous1 extends LinearOpMode {
 
     /********************
@@ -486,7 +486,7 @@ public class SheldonAutonomous1 extends LinearOpMode {
                 }
 
             } else if (sheldon.getColorSensor1ColorDetected() != TEAM_COLOR && sheldon.getColorSensor2ColorDetected() == TEAM_COLOR) {
-                if (sheldon.rightBeaconServo.getPosition() <= .16) {  //Assume left beacon servo motor is retracted
+                if (sheldon.rightBeaconServo.getPosition() <= .3) {  //Assume left beacon servo motor is retracted
 
                     while (sheldon.getColorSensor1ColorDetected() != TEAM_COLOR && sheldon.getColorSensor2ColorDetected() == TEAM_COLOR) {
                         sheldon.deployRightBeaconServo();
@@ -512,12 +512,12 @@ public class SheldonAutonomous1 extends LinearOpMode {
 
         }
 
-        telemetry.addData(">", "Robot Heading = %d", gyro.getIntegratedZValue());
-        telemetry.addData("Current Team Color Selected", TEAM_COLOR);
-        telemetry.addData("Color Sensor 1", sheldon.getColorSensor1Status());
-        telemetry.addData("Color Sensor 2", sheldon.getColorSensor2Status());
-        telemetry.addData("Beacon Status:", beaconActivated);
-        telemetry.update();
+//        telemetry.addData(">", "Robot Heading = %d", gyro.getIntegratedZValue());
+//        telemetry.addData("Current Team Color Selected", TEAM_COLOR);
+//        telemetry.addData("Color Sensor 1", sheldon.getColorSensor1Status());
+//        telemetry.addData("Color Sensor 2", sheldon.getColorSensor2Status());
+//        telemetry.addData("Beacon Status:", beaconActivated);
+//        telemetry.update();
     }
 
     /**
