@@ -133,30 +133,30 @@ class ServoMotorHardware extends DcMotorHardware {
     } // end of initializeServoMotors() Method
 
 
-    /**
-     * forkGripperOpen Method opens the forks when called
-     *
-     * @param gripperServoSpeed      - Speed at which to move the gripper servos
-     * @param directionToMoveGripper - Given as either OPEN or CLOSE
-     */
+//    /**
+//     * forkGripperOpen Method opens the forks when called
+//     *
+//     * @param gripperServoSpeed      - Speed at which to move the gripper servos
+//     * @param directionToMoveGripper - Given as either OPEN or CLOSE
+//     */
 
-    void forkGripperMove(String directionToMoveGripper, double gripperServoSpeed) {
-
-        if (directionToMoveGripper.equals("OPEN")) {
-
-            leftForkGripperServo.setPower(gripperServoSpeed);
-            rightForkGripperServo.setPower(gripperServoSpeed);
-
-        } else if (directionToMoveGripper.equals("CLOSE")) {
-            leftForkGripperServo.setPower(-gripperServoSpeed);
-            rightForkGripperServo.setPower(-gripperServoSpeed);
-        }
-    }
-
-    void forkGripperStop() {
-        leftForkGripperServo.setPower(0);
-        rightForkGripperServo.setPower(0);
-    }
+//    void forkGripperMove(String directionToMoveGripper, double gripperServoSpeed) {
+//
+//        if (directionToMoveGripper.equals("OPEN")) {
+//
+//            leftForkGripperServo.setPower(gripperServoSpeed);
+//            rightForkGripperServo.setPower(gripperServoSpeed);
+//
+//        } else if (directionToMoveGripper.equals("CLOSE")) {
+//            leftForkGripperServo.setPower(-gripperServoSpeed);
+//            rightForkGripperServo.setPower(-gripperServoSpeed);
+//        }
+//    }
+//
+//    void forkGripperStop() {
+//        leftForkGripperServo.setPower(0);
+//        rightForkGripperServo.setPower(0);
+//    }
 
 //    //Method to move the mast servos forward and reverse
 //    void mastServoMove(String directionToMove, double mastServoSpeed) {

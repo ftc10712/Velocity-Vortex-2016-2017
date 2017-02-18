@@ -41,18 +41,18 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 
 @Autonomous(name = "Sheldon: Two Beacon Autonomous", group = "Robot Position 1")
-@Disabled
-public class SheldonAutonomous1 extends LinearOpMode {
+//@Disabled
+public class SheldonAutonomousBak2 extends LinearOpMode {
 
-    /********************
-     * Declare OpMode Member Variables
+    /********************************************
+     * Declare OpMode Member Variables     *
      ********************************************/
 
     Robot sheldon = new Robot();                      // Use a Sheldon's hardware
 
     ModernRoboticsI2cGyro gyro = null;                // Additional Gyro device
 
-    private ElapsedTime runtime = new ElapsedTime(); //Create a tmer object
+    private ElapsedTime runtime = new ElapsedTime();  //Set an instance of a timer
 
     //Calculate Encder Ticks for Motors
     static final double COUNTS_PER_MOTOR_REV = 1680;  // eg: AndyMark Motor Encoder
@@ -88,7 +88,9 @@ public class SheldonAutonomous1 extends LinearOpMode {
     // and divide by 2 to get this value
     double whiteLineCorrection;
 
-    /*********************** End of OpMode Member Variables ***************************************/
+    /***********************
+     * End of OpMode Member Variables
+     ***************************************/
 
     @Override
     public void runOpMode() {
@@ -168,34 +170,17 @@ public class SheldonAutonomous1 extends LinearOpMode {
         //gamepad1 to the autonomous mode and select the x button if the team color is blue
         //or b if the team color is red (those are the colors of the buttons on the gamepad)
         //This will set the TEAM_COLOR variable and the teamColorCoefficient which will determine
-        //turns made regardless of which team is selected.Test
+        //turns made regardless of which team is selected.
 
         gyroDrive(DRIVE_SPEED, 15.0, (teamColorCoefficient * 0.0));   // Step A - Drive 15" on heading of 0 degrees
         gyroTurn(TURN_SPEED, (teamColorCoefficient * 45.0));          // Step B - Turn to a heading of 45 degrees (left or right depending on color)
         gyroHold(TURN_SPEED, (teamColorCoefficient * 45.0), 0.5);     // Step B Continued - Hold the heading and rest for .5 seconds for gyro to settle
-        gyroDrive(DRIVE_SPEED, 49.0, (teamColorCoefficient * 45.0));  // Step C -Drive 49" on heading of 45 degrees (left or right depending on color)
+        gyroDrive(DRIVE_SPEED, 51.0, (teamColorCoefficient * 45.0));  // Step C -Drive 51" on heading of 45 degrees (left or right depending on color)
         gyroTurn(TURN_SPEED, (teamColorCoefficient * 90.0));          // Step D - Turn to a heading of 90 degrees (left or right depending on color)
         gyroHold(TURN_SPEED, (teamColorCoefficient * 90.0), 0.5);     // Step D Continued - Hold the heading and rest for .5 seconds for gyro to settle
-        gyroDrive(DRIVE_SPEED, 7.0, (teamColorCoefficient * 90.0));
-        lookForColorBeacon(.2, .15);                                   // Step E - Drive forward slowly looking for color beacon - Params (leftspeed, rightspeed)
-        driveRobotBackwards(.5, .5, .5);                                // Step F - Drive robot backward at .5 power for .5 seconds
-        gyroTurn(TURN_SPEED, (teamColorCoefficient * 0.0));           // Step G - Turn to a heading of 0 degrees (left or right depending on color)
-        gyroHold(TURN_SPEED, (teamColorCoefficient * 0.0), 0.5);      // Step G Continued - Hold the heading and rest for .5 seconds for gyro to settle
-        gyroDrive(DRIVE_SPEED, 46.0, (teamColorCoefficient * 0.0));   // Step H-  Drive 46" on heading of 0 degrees (left or right depending on color)
-        gyroTurn(TURN_SPEED, (teamColorCoefficient * 90.0));          // Step I - Turn to a heading of 90 degrees (left or right depending on color)
-        gyroHold(TURN_SPEED, (teamColorCoefficient * 90.0), 0.5);     // Step I Continued - Hold the heading and rest for .5 seconds for gyro to settle
-        gyroDrive(DRIVE_SPEED, 1.75, (teamColorCoefficient * 90.0));
-        lookForColorBeacon(.2, .15);                                   // Step J - Drive forward slowly looking for color beacon - Params (leftspeed, rightspeed)
-        driveRobotBackwards(.5, .5, .5);                                // Step K - Drive robot backward at .5 power for .5 seconds
-        gyroTurn(TURN_SPEED, (teamColorCoefficient * 180.0));         // Step L - Turn to a heading of 180 degrees (left or right depending on color)
-        gyroHold(TURN_SPEED, (teamColorCoefficient * 180.0), 0.5);    // Step L Continued - Hold the heading and rest for .5 seconds for gyro to settle
-        gyroDrive(1.0, 81.0, (teamColorCoefficient * 180.0));         // Step M - Drive 81" at ful speed on heading of 180 degrees (left or right depending on color)
-        //Park on ramp
+        lookForColorBeacon();                                       // Step E - Drive forward slowly looking for color beacon
 
-        telemetry.addData(">", "Robot Heading = %d", gyro.getIntegratedZValue());
-        telemetry.addData("Current Team Color Selected", TEAM_COLOR);
-        telemetry.addData("Color Sensor 1", sheldon.getColorSensor1Status());
-        telemetry.addData("Color Sensor 2", sheldon.getColorSensor2Status());
+
         telemetry.addData("Path", "Complete");
         telemetry.update();
     }
@@ -463,17 +448,12 @@ public class SheldonAutonomous1 extends LinearOpMode {
     }
 
     /**
-     * Purpose: Method to slowly approach beacons and deploy appropriate beacon pusher servo
+     * Purpose:  Method to slowly approach beacons and deploy appropriate beacon pusher servo
      * when successful, it will stop.
-     * @param leftApproachSpeed - Speed at which left motor should drive
-     * @param rightApproachSpeed - Speed at which right motors should drive
      */
-
-    public void lookForColorBeacon(double leftApproachSpeed, double rightApproachSpeed) {
-        leftApproachSpeed = .2;
-        rightApproachSpeed = .15;
-
-        sheldon.driveRobot(leftApproachSpeed, rightApproachSpeed);
+    public void lookForColorBeacon() {
+        double leftApproachSpeed = .2;
+        double rightApproachSpeed = .15;
 
         while (beaconActivated == "Not Activated") {
             if (sheldon.getColorSensor1ColorDetected() == TEAM_COLOR && sheldon.getColorSensor2ColorDetected() != TEAM_COLOR) {
@@ -497,54 +477,19 @@ public class SheldonAutonomous1 extends LinearOpMode {
 
             } else if (sheldon.getColorSensor1ColorDetected() == TEAM_COLOR && sheldon.getColorSensor2ColorDetected() == TEAM_COLOR) {
                 //If we have made it here, we have successfully tripped the beacon so stop motors
-                //sheldon.driveRobot(0, 0);
+                sheldon.driveRobot(0, 0);
                 sheldon.retractLeftBeaconServo();
                 sheldon.retractRightBeaconServo();
                 beaconActivated = "Successfully Activated!";
 
             } else {
                 //Add code to slowly drive toward beacons continuing to look for beacons
-
-                //sheldon.driveRobot(leftApproachSpeed,rightApproachSpeed);
+                sheldon.driveRobot(leftApproachSpeed, rightApproachSpeed);
                 sheldon.retractLeftBeaconServo();
                 sheldon.retractRightBeaconServo();
             }
 
         }
-
-        telemetry.addData(">", "Robot Heading = %d", gyro.getIntegratedZValue());
-        telemetry.addData("Current Team Color Selected", TEAM_COLOR);
-        telemetry.addData("Color Sensor 1", sheldon.getColorSensor1Status());
-        telemetry.addData("Color Sensor 2", sheldon.getColorSensor2Status());
-        telemetry.addData("Beacon Status:", beaconActivated);
-        telemetry.update();
     }
 
-    /**
-     * Purpose:  Drive Robot backwards by time because our rear wheels are not connected to encoders
-     */
-
-    /**
-     * Purpose:  Drive Robot backwards by time because our rear wheels are not connected to encoders
-     *
-     * @param leftBackupSpeed  - Left backupspeed to adjust if left side is fasster or slower
-     * @param rightBackupSpeed - Right backup speed to adjust if right side is faster or slower
-     * @param timeToBackup     - Total amount of time to backup in seconds
-     */
-    void driveRobotBackwards(double leftBackupSpeed, double rightBackupSpeed, double timeToBackup) {
-
-        sheldon.driveRobot(leftBackupSpeed, rightBackupSpeed);
-
-        runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < timeToBackup)) {
-            telemetry.addData("Backing Up:", "%2.5f S Elapsed", runtime.seconds());
-            telemetry.update();
-        }
-
-        //Time has been reached so stop the robot
-        sheldon.driveRobot(0, 0);
-        telemetry.addData("Path", "Complete");
-        telemetry.update();
-        sleep(500);
-    }
 }// End of Linear Op Mode

@@ -20,8 +20,8 @@ class DcMotorHardware {
     protected DcMotor rightRearMotor;
     protected DcMotor leftFrontMotor;
     protected DcMotor leftRearMotor;
-    protected DcMotor leftParticleMotor;
-    protected DcMotor rightParticleMotor;
+    protected DcMotor leftForkGripperMotor;
+    protected DcMotor rightForkGripperMotor;
     private DcMotor leftMastLiftMotor;
     private DcMotor rightMastLiftMotor;
 
@@ -30,8 +30,8 @@ class DcMotorHardware {
     String leftRearMotorStatus = "null";
     String rightFrontMotorStatus = "null";
     String rightRearMotorStatus = "null";
-    String leftParticleMotorStatus = "null";
-    String rightParticleMotorStatus = "null";
+    String leftForkGripperMotorStatus = "null";
+    String rightForkGripperMotorStatus = "null";
     String leftMastLiftMotorStatus = "null";
     String rightMastLiftMotorStatus = "null";
 
@@ -91,22 +91,22 @@ class DcMotorHardware {
         }
 
         try {
-            leftParticleMotor = hwMap.dcMotor.get("left_particle_motor");
-            leftParticleMotor.setDirection(REVERSE);
-            leftParticleMotorStatus = "Initialized";
+            leftForkGripperMotor = hwMap.dcMotor.get("left_fork_gripper_motor");
+            leftForkGripperMotor.setDirection(REVERSE);
+            leftForkGripperMotorStatus = "Initialized";
         } catch (Exception errorMessage) {
             DbgLog.msg(errorMessage.getLocalizedMessage());
-            leftParticleMotor = null;
-            leftParticleMotorStatus = "Failed to Initialize";
+            leftForkGripperMotor = null;
+            leftForkGripperMotorStatus = "Failed to Initialize";
         }
 
         try {
-            rightParticleMotor = hwMap.dcMotor.get("right_particle_motor");
-            rightParticleMotorStatus = "Initialized";
+            rightForkGripperMotor = hwMap.dcMotor.get("right_fork_gripper_motor");
+            rightForkGripperMotorStatus = "Initialized";
         } catch (Exception errorMessage) {
             DbgLog.msg(errorMessage.getLocalizedMessage());
-            rightParticleMotor = null;
-            rightParticleMotorStatus = "Failed to Initialize";
+            rightForkGripperMotor = null;
+            rightForkGripperMotorStatus = "Failed to Initialize";
         }
 
         try {
@@ -177,22 +177,22 @@ class DcMotorHardware {
         }
 
         try {
-            leftParticleMotor = hwMap.dcMotor.get("left_particle_motor");
-            leftParticleMotor.setDirection(REVERSE);
-            leftParticleMotorStatus = "Initialized";
+            leftForkGripperMotor = hwMap.dcMotor.get("left_fork_gripper_motor");
+            leftForkGripperMotor.setDirection(REVERSE);
+            leftForkGripperMotorStatus = "Initialized";
         } catch (Exception errorMessage) {
             DbgLog.msg(errorMessage.getLocalizedMessage());
-            leftParticleMotor = null;
-            leftParticleMotorStatus = "Failed to Initialize";
+            leftForkGripperMotor = null;
+            leftForkGripperMotorStatus = "Failed to Initialize";
         }
 
         try {
-            rightParticleMotor = hwMap.dcMotor.get("right_particle_motor");
-            rightParticleMotorStatus = "Initialized";
+            rightForkGripperMotor = hwMap.dcMotor.get("right_fork_gripper_motor");
+            rightForkGripperMotorStatus = "Initialized";
         } catch (Exception errorMessage) {
             DbgLog.msg(errorMessage.getLocalizedMessage());
-            rightParticleMotor = null;
-            rightParticleMotorStatus = "Failed to Initialize";
+            rightForkGripperMotor = null;
+            rightForkGripperMotorStatus = "Failed to Initialize";
         }
 
         try {
@@ -229,12 +229,12 @@ class DcMotorHardware {
      * Paramter values are currelnt statically passed as the particle shooter is operated with a toggle
      * button.  The particle shooter is either on or off but not a variable speed.
      *
-     * @param leftParticleMotorPower  - Variable type double - Can contain values 0.0 - 1.0
-     * @param rightParticleMotorPower - Variable type double - Can contain values 0.0 - 1.0
+     * @param forkGripperMotorPower  - Variable type double - Can contain values 0.0 - 1.0
+     * @param forkGripperMotorPower - Variable type double - Can contain values 0.0 - 1.0
      */
-    void toggleParticleShooterMotors(double leftParticleMotorPower, double rightParticleMotorPower) {
-        leftParticleMotor.setPower(leftParticleMotorPower);
-        rightParticleMotor.setPower(rightParticleMotorPower);
+    void driveForkGripperMotors(float forkGripperMotorPower) {
+        leftForkGripperMotor.setPower(forkGripperMotorPower);
+        rightForkGripperMotor.setPower(forkGripperMotorPower);
     }
 
     /**

@@ -39,8 +39,8 @@ public class SheldonTeleOp extends OpMode {
         telemetry.addData("Left Rear DC Motor", sheldon.leftRearMotorStatus);
         telemetry.addData("Right Front DC Motor", sheldon.rightFrontMotorStatus);
         telemetry.addData("Right Rear DC Motor", sheldon.rightRearMotorStatus);
-        telemetry.addData("Left Particle DC Motor", sheldon.leftParticleMotorStatus);
-        telemetry.addData("Right Particle DC Motor", sheldon.rightParticleMotorStatus);
+        telemetry.addData("Left Particle DC Motor", sheldon.leftForkGripperMotorStatus);
+        telemetry.addData("Right Particle DC Motor", sheldon.rightForkGripperMotorStatus);
         telemetry.addData("Left Mast Lift Motor", sheldon.leftMastLiftMotorStatus);
         telemetry.addData("Right Mast Lift Motor", sheldon.rightMastLiftMotorStatus);
 
@@ -99,18 +99,19 @@ public class SheldonTeleOp extends OpMode {
 
 
         /**********************Start of Gripper Moving Routine***************/
-        //Gripper Servo Variables
-        String gripperDirectionToMove = "Not Initialized";
-        double gripperServoSpeed = 1.0; //Set Gripper Servo Speed 0.0-1.0
+        //Gripper Motor Power Variables
+        //String gripperDirectionToMove = "Not Initialized";
+        float forkGripperOpenPower = 0.1f; //Set open power
+        float forkGripperClosePower = -0.1f; //Set open power
+        float forkGripperStopPower = 0; //Set Power to Stop
 
         if (gamepad1.right_bumper) {
-            gripperDirectionToMove = "OPEN";
-            sheldon.forkGripperMove(gripperDirectionToMove, gripperServoSpeed);
+            sheldon.driveForkGripperMotors(forkGripperOpenPower);
         } else if (gamepad1.left_bumper) {
-            gripperDirectionToMove = "CLOSE";
-            sheldon.forkGripperMove(gripperDirectionToMove, gripperServoSpeed);
+            //Close Grippers
+            sheldon.driveForkGripperMotors(forkGripperClosePower);
         } else {
-            sheldon.forkGripperStop();
+            sheldon.driveForkGripperMotors(forkGripperStopPower);
         }
         /**********************End of Gripper Moving Routine*****************/
 
@@ -136,7 +137,7 @@ public class SheldonTeleOp extends OpMode {
 
         if (gamepad1.y) {
             sheldon.driveMastLiftPower(mastLiftPowerUp);
-
+            //sheldon.driveForkGripperMotors(.1f);
         } else if (gamepad1.a) {
             sheldon.driveMastLiftPower(mastLiftPowerDown);
         } else {
